@@ -333,9 +333,36 @@ QMChatCellDelegate
     }
     
     UIFont *font = [UIFont fontWithName:@"HelveticaNeue" size:17.0f] ;
-    NSDictionary *attributes = @{ NSForegroundColorAttributeName:textColor, NSFontAttributeName:font};
+    
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    
+    paragraphStyle.lineHeightMultiple = 1.0;
+    paragraphStyle.minimumLineHeight = font.lineHeight;
+    paragraphStyle.maximumLineHeight = font.lineHeight;
+    paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+
+    NSDictionary *attributes = @{ NSForegroundColorAttributeName:textColor, NSFontAttributeName:font,
+                                  NSParagraphStyleAttributeName: paragraphStyle};
+    
     
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:messageItem.text ? messageItem.text : @"" attributes:attributes];
+    
+    NSMutableParagraphStyle *emojiParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+    emojiParagraphStyle.lineBreakMode =  NSLineBreakByCharWrapping;
+    paragraphStyle.lineHeightMultiple = 1.0;
+    paragraphStyle.minimumLineHeight = font.lineHeight;
+    paragraphStyle.maximumLineHeight = font.lineHeight;
+
+    NSArray * ranges = [messageItem.text emo_emojiRanges];
+    
+    for (NSValue * rangeValue in ranges) {
+        NSRange range = [rangeValue rangeValue];
+        if (range.location != NSNotFound) {
+            [attrStr setAttributes:@{NSFontAttributeName:font,
+                                     NSParagraphStyleAttributeName: emojiParagraphStyle}
+                             range:range];
+        }
+    }
 
     return attrStr;
 }
