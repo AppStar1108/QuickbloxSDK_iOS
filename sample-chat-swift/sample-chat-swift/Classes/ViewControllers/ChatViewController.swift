@@ -470,13 +470,43 @@ class ChatViewController: QMChatViewController, QMChatServiceDelegate, UIActionS
         if messageItem.isNotificatonMessage() {
             textColor = UIColor.blackColor()
         }
-        
+        let font = UIFont(name: "Helvetica", size: 17)
         var attributes = Dictionary<String, AnyObject>()
         attributes[NSForegroundColorAttributeName] = textColor
-        attributes[NSFontAttributeName] = UIFont(name: "Helvetica", size: 17)
+        attributes[NSFontAttributeName] = font
         
-        let attributedString = NSAttributedString(string: messageItem.text!, attributes: attributes)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 1.0;
+        paragraphStyle.minimumLineHeight = font!.lineHeight
+        paragraphStyle.maximumLineHeight = font!.lineHeight
+        paragraphStyle.lineBreakMode = .ByWordWrapping
         
+        attributes[NSParagraphStyleAttributeName] = paragraphStyle
+        
+        let attributedString = NSMutableAttributedString(string: messageItem.text!, attributes: attributes)
+        
+        let messageText = messageItem.text!
+        
+        if (messageText as NSString).emo_emojiCount() > 0 {
+            
+            let emojiParagraphStyle = NSMutableParagraphStyle()
+            emojiParagraphStyle.lineHeightMultiple = 1.0;
+            emojiParagraphStyle.minimumLineHeight = font!.lineHeight
+            emojiParagraphStyle.maximumLineHeight = font!.lineHeight
+            emojiParagraphStyle.lineBreakMode = .ByCharWrapping
+            
+            var attributes2 = Dictionary<String, AnyObject>()
+            attributes2[NSFontAttributeName] = font
+            attributes2[NSParagraphStyleAttributeName] = emojiParagraphStyle
+
+            let ranges : [NSRange] = (messageText as NSString).emo_emojiRanges() as NSArray as! [NSRange]
+    
+            for range in ranges where range.location != NSNotFound {
+                
+                attributedString.addAttributes(attributes2, range: range)
+            }
+        }
+
         return attributedString
     }
     
