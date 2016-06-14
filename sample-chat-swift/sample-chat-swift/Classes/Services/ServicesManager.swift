@@ -14,7 +14,7 @@ import Foundation
 class ServicesManager: QMServicesManager {
     
     var currentDialogID = ""
-    
+    var isProcessingLogOut: Bool!
     var colors = [
         UIColor(red: 0.992, green:0.510, blue:0.035, alpha:1.000),
         UIColor(red: 0.039, green:0.376, blue:1.000, alpha:1.000),
@@ -30,12 +30,13 @@ class ServicesManager: QMServicesManager {
     
     private var contactListService : QMContactListService!
     var notificationService: NotificationService!
+    weak private var logoutTask: BFTask?
     //var lastActivityDate: NSDate!
     
     override init() {
         super.init()
-        
         self.setupContactServices()
+        self.isProcessingLogOut = false
     }
     
     private func setupContactServices() {
@@ -199,4 +200,49 @@ class ServicesManager: QMServicesManager {
         }
     }
     
+    func logOutUser() -> BFTask {
+        
+        if self.logoutTask != nil {
+           return BFTask.cancelledTask()
+        }
+        else {
+            
+            let source = BFTaskCompletionSource()
+            
+            self.unSubscribeFromPushNotifications().continueWithBlock({[weak self]  (task: BFTask!) -> AnyObject? in
+                if task.error != nil {
+                    print("Error on subscribe - \(task.error?.localizedDescription)")
+                }
+                guard let strongSelf = self else { return nil}
+                
+                strongSelf.logoutWithCompletion({
+                    source.setResult(true)
+                })
+                    return nil
+                })
+            
+            self.logoutTask = source.task
+            return self.logoutTask!
+        }
+    }
+    
+    func unSubscribeFromPushNotifications() -> BFTask  {
+        
+        let task = BFTaskCompletionSource()
+        
+        let deviceIdentifier = UIDevice.currentDevice().identifierForVendor!.UUIDString
+        
+        QBRequest.unregisterSubscriptionForUniqueDeviceIdentifier(deviceIdentifier, successBlock: { (response: QBResponse!) -> Void in
+            
+            task.setResult(true)
+            
+        }) { (error: QBError?) -> Void in
+            
+            task.setError(error!.error!)
+        }
+        
+        return task.task
+        
+    }
 }
+

@@ -34,6 +34,8 @@ class AlertView: NSObject, UIAlertViewDelegate {
     }
     
     internal func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+        alert.delegate = nil
+        
         if let action = self.callBack {
             action(buttonIndex)
         }
