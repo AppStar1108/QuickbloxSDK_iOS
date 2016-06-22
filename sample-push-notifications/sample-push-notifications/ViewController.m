@@ -41,13 +41,13 @@
     [self.pushMessageTextView.layer addSublayer:bottomBorder];
     
     self.pushMessages = [NSMutableArray array];
-    self.tableView.hidden = YES;
+    //self.tableView.hidden = YES;
    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(pushDidReceive:)
                                                  name:@"kPushDidReceive"
                                                object:nil];
-
+self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     self.sendPushButton.enabled = NO;
     
     __weak typeof(self) weakSelf = self;
@@ -69,7 +69,7 @@
     NSString *message = [notification userInfo][@"message"];
     
     [self.pushMessages addObject:message];
-    self.tableView.hidden = NO;
+   // self.tableView.hidden = NO;
     
     [self.tableView reloadData];
 }

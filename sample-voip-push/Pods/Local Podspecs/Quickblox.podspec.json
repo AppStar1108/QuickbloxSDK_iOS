@@ -1,0 +1,60 @@
+{
+  "name": "Quickblox",
+  "version": "2.7.3",
+  "summary": "Library of classes to connect with Quickblox services",
+  "homepage": "http://quickblox.com",
+  "license": "MIT",
+  "authors": {
+    "Igor Khomenko": "igor@quickblox.com",
+    "Andrey Ivanov": "andrey.ivanov@quickblox.com",
+    "Vitaliy Gorbachov": "vitaliy.gorbachov@quickblox.com",
+    "Vitaliy Gurkovsky": "vitaliy.gurkovsky@injoit.com"
+  },
+  "requires_arc": true,
+  "platforms": {
+    "ios": "7.0"
+  },
+  "xcconfig": {
+    "OTHER_LDFLAGS": "-ObjC"
+  },
+  "source": {
+    "git": "git@github.com:QuickBlox/SDK-ios.git"
+  },
+  "vendored_frameworks": [
+    "Framework/Core/External/QBAFNetworking/AFNetworking.framework",
+    "Framework/Core/External/QBBolts/Bolts.framework",
+    "Framework/Core/External/QBFBKVOController/FBKVOController.framework"
+  ],
+  "subspecs": [
+    {
+      "name": "Header",
+      "source_files": [
+        "Framework/Quickblox.{h}",
+        "Framework/PublicHeaders/**.{h}"
+      ]
+    },
+    {
+      "name": "sources",
+      "libraries": "iconv",
+      "source_files": [
+        "Framework/ChatService/**/*.{h,m}",
+        "Framework/QBAuth/**/*.{h,m}",
+        "Framework/QBChat/**/*.{h,m}",
+        "Framework/QBContent/**/*.{h,m}",
+        "Framework/Core/**/*.{h,m}",
+        "Framework/QBCore/**/*.{h,m}",
+        "Framework/QBCustomObjects/**/*.{h,m}",
+        "Framework/QBLocation/**/*.{h,m}",
+        "Framework/QBPushNotifications/**/*{h,m}",
+        "Framework/QBUsers/**/*.{h,m}",
+        "iconv",
+        "xml2",
+        "stdc++"
+      ],
+      "xcconfig": {
+        "HEADER_SEARCH_PATHS": "\"$(SDKROOT)/usr/include/libxml2\"",
+        "OTHER_LDFLAGS": "-lresolv"
+      }
+    }
+  ]
+}

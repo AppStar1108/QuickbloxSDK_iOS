@@ -1,0 +1,13 @@
+PODS:
+  - QuickBlox (2.7.3)
+  - SVProgressHUD (2.0.3)
+
+DEPENDENCIES:
+  - QuickBlox
+  - SVProgressHUD
+
+SPEC CHECKSUMS:
+  QuickBlox: 28720ddcb52d43879e2732f04c72900e38937cca
+  SVProgressHUD: b0830714205bea1317ea1a2ebc71e5633af334d4
+
+COCOAPODS: 0.39.0
