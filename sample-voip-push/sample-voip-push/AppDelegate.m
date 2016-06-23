@@ -9,10 +9,10 @@
 #import "AppDelegate.h"
 #import <Quickblox/Quickblox.h>
 
-const NSUInteger kApplicationID = 92;
-NSString *const kAuthKey        = @"wJHdOcQSxXQGWx5";
-NSString *const kAuthSecret     = @"BTFsj7Rtt27DAmT";
-NSString *const kAccountKey     = @"7yvNe17TnjNUqDoPwfqp";
+const NSUInteger kApplicationID = 40991;
+NSString *const kAuthKey        = @"EC2dWXrwjBC2qUw";
+NSString *const kAuthSecret     = @"W7nn75ZQZxOvsbZ";
+NSString *const kAccountKey     = @"2PWNxho7bNszoLp6EaDs";
 
 @interface AppDelegate ()
 
@@ -30,6 +30,9 @@ NSString *const kAccountKey     = @"7yvNe17TnjNUqDoPwfqp";
     [QBSettings setAuthKey:kAuthKey];
     [QBSettings setAuthSecret:kAuthSecret];
     [QBSettings setAccountKey:kAccountKey];
+    
+    [QBSettings setApiEndpoint:@"https://apistage1.quickblox.com" chatEndpoint:@"chat.apistage1.quickblox.com" forServiceZone:QBConnectionZoneTypeDevelopment];
+    [QBSettings setServiceZone:QBConnectionZoneTypeDevelopment];
     
     return YES;
 }

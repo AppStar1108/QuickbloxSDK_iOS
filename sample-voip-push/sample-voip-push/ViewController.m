@@ -72,18 +72,34 @@
 #pragma mark IBActions
 - (IBAction)sendAction:(UIBarButtonItem *)sender {
     
+    
+    
     NSString *message = self.pushMessageTextView.text;
-    NSString *userID = [NSString stringWithFormat:@"%zd",[[QBSession currentSession] currentUser].ID];
-    
-    [QBRequest sendVOIPPushWithText:message toUsers:userID
-                       successBlock:^(QBResponse * _Nonnull response, NSArray<QBMEvent *> * _Nullable events) {
-                           
-                       } errorBlock:^(QBError * _Nullable error) {
-                           
-                       }];
-    
 
- 
+    // empty text
+    if([message length] == 0) {
+        [SVProgressHUD showErrorWithStatus:@"Please enter some text"];
+        
+    }
+    else {
+        
+        NSString *userID = [NSString stringWithFormat:@"%zd",[[QBSession currentSession] currentUser].ID];
+        
+        [self.view endEditing:YES];
+        
+        [QBRequest sendVOIPPushWithText:message toUsers:userID
+                           successBlock:^(QBResponse * _Nonnull response, NSArray<QBMEvent *> * _Nullable events) {
+                               
+                               [SVProgressHUD showInfoWithStatus:@"Push was sent"];
+                               
+                           } errorBlock:^(QBError * _Nullable error) {
+                               [SVProgressHUD showErrorWithStatus:error.error.localizedDescription];
+                           }];
+        
+        [self.pushMessageTextView resignFirstResponder];
+        self.pushMessageTextView.text = nil;
+    }
+
 }
 
 #pragma mark -
@@ -114,11 +130,36 @@
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type
 {
     //push received
-    NSDictionary *dictPayload = payload.dictionaryPayload;
+    NSDictionary *dictPayload = payload.dictionaryPayload[@"aps"];
+    NSString * message = dictPayload[@"alert"];
+    
+    if (!message.length) {
+        return;
+    }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.pushMessages addObject:message];
+            [self.tableView reloadData];
+        });
+    
+    //present a local notifcation to visually see when we are recieving a VoIP Notification
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
+        UILocalNotification * locatNotif = [[UILocalNotification alloc] init];
+        locatNotif.alertBody = message;
+        locatNotif.soundName = UILocalNotificationDefaultSoundName;
+        
+        [[UIApplication sharedApplication] presentLocalNotificationNow:locatNotif];
+    }
+
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry didUpdatePushCredentials:(PKPushCredentials *)credentials forType:(NSString *)type
 {
+    if([credentials.token length] == 0) {
+        [SVProgressHUD showErrorWithStatus:@"voip token NULL"];
+        return;
+    }
+
     NSString *deviceIdentifier = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     
     // subscribing for push notifications
@@ -158,7 +199,7 @@
         
         [SVProgressHUD showWithStatus:@"Initialising"];
         
-        [QBRequest logInWithUserLogin:@"qbpushios" password:@"qbpushios" successBlock:^(QBResponse *response, QBUUser *user) {
+        [QBRequest logInWithUserLogin:@"voip_user" password:@"testtest" successBlock:^(QBResponse *response, QBUUser *user) {
             
             [SVProgressHUD dismiss];
             
